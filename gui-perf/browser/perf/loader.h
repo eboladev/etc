@@ -11,16 +11,14 @@ class Loader : public QObject
     Q_OBJECT
 
 public:
-    explicit Loader(QObject *parent = 0);
-
-signals:
+    explicit Loader(QObject *parent = 0): QObject(parent) {
+    }
 
 public slots:
     void requestImage(int row, const QString &file);
 
 signals:
     void loadedImage(int row, QImage *image);
-
 };
 
 class LoaderThread: public QThread

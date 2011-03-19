@@ -26,7 +26,8 @@ Model::Model(const QString &root, QObject *parent): QStringListModel(parent)
 Model::~Model()
 {
     loaderThread.quit();
-    loaderThread.wait();}
+    loaderThread.wait();
+}
 
 QVariant Model::data(const QModelIndex &i, int role) const
 {
