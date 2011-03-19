@@ -5,6 +5,7 @@
 #include <QModelIndex>
 #include <QVariant>
 #include <QImage>
+#include <QList>
 
 #include "loader.h"
 
@@ -23,10 +24,15 @@ public:
 public slots:
     void onImageLoaded(int row, QImage *image);
 
+protected:
+    void timerEvent(QTimerEvent *e);
+
 private:
     void setupModelData(const QString &root);
+    void requestImage(const QModelIndex &i) const;
     Loader *loader;
     LoaderThread loaderThread;
+    int timerId;
 };
 
 #endif // MODEL_H

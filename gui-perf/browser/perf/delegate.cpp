@@ -9,7 +9,7 @@ void Delegate::paint(QPainter *painter,
                      const QStyleOptionViewItem &option,
                      const QModelIndex &index) const
 {
-    painter->setBrush(QBrush(Qt::white));
+    painter->setBrush(QBrush(Qt::darkGray));
     painter->setPen(QPen(Qt::gray));
     painter->drawRect(option.rect);
 
@@ -19,6 +19,15 @@ void Delegate::paint(QPainter *painter,
         int sourceY = image.height() / 2 - option.rect.height() / 2;
         painter->drawImage(option.rect.x(), option.rect.y(),
                            image, 0, sourceY);
+
+        QString label = model->data(index, Qt::DisplayRole).toString();
+        QFont font = painter->font();
+        font.setPixelSize(22);
+        painter->setFont(font);
+        painter->setPen(QPen(Qt::black));
+        painter->drawText(option.rect.x() + 21, option.rect.y() + 181, label);
+        painter->setPen(QPen(Qt::white));
+        painter->drawText(option.rect.x() + 20, option.rect.y() + 180, label);
     }
 }
 
