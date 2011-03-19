@@ -9,8 +9,6 @@ HEADERS += \
     item.h \
     delegate.h
 
-RESOURCES += \
-    resources.qrc
+RESOURCES +=
 
-OTHER_FILES += \
-    default.txt
+OTHER_FILES +=
