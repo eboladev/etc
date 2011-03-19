@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     QListView view;
     view.setModel(&model);
     view.setItemDelegate(new Delegate());
-    view.setWindowTitle(QObject::tr("Browser (Unoptimized)"));
+    view.setWindowTitle(QObject::tr("Browser (Optimized)"));
     view.setGeometry(50, 50, 640, 480);
     view.show();
     return app.exec();

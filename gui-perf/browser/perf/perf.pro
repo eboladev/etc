@@ -1,13 +1,13 @@
 SOURCES += \
     model.cpp \
-    item.cpp \
     main.cpp \
-    delegate.cpp
+    delegate.cpp \
+    loader.cpp
 
 HEADERS += \
     model.h \
-    item.h \
-    delegate.h
+    delegate.h \
+    loader.h
 
 RESOURCES +=
 

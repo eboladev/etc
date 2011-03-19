@@ -2,102 +2,71 @@
 #include <QDir>
 #include <QFile>
 #include <QDebug>
+#include <QCache>
 
-#include "item.h"
 #include "model.h"
+#include "loader.h"
 
-Model::Model(const QString &root, QObject *parent): QAbstractItemModel(parent)
+static QCache<int, QImage> cache(500);
+
+Model::Model(const QString &root, QObject *parent): QStringListModel(parent)
 {
-    qDebug() << "Model::Model" << root;
-    QString rootData("Name");
-    rootItem = new Item(rootData);
-    setupModelData(root, rootItem);
+    setupModelData(root);
+    loader = new Loader(parent);
+    connect(loader, SIGNAL(loadedImage(int, QImage *)),
+            this, SLOT(onImageLoaded(int, QImage *)));
+    loader->moveToThread(&loaderThread);
+    loaderThread.start();
+    loaderThread.setPriority(QThread::LowestPriority);
 }
 
 Model::~Model()
 {
-    delete rootItem;
-}
-
-int Model::columnCount(const QModelIndex &parent) const
-{
-    if (parent.isValid()) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
+    loaderThread.quit();
+    loaderThread.wait();}
 
 QVariant Model::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
+    if (role != Model::ImageRole) {
+        return QStringListModel::data(index, role);
+    }
+    if (!index.isValid()) {
         return QVariant();
+    }
 
-    if (role != Qt::DisplayRole)
-        return QVariant();
+    int row = index.row();
+    if (cache.contains(row)) {
+        qDebug() << "Model::data" << row << "served from cache";
+    } else {
+        qDebug() << "Model::data" << row << "not in cache";
 
-    Item *item = static_cast<Item*>(index.internalPointer());
-    return item->data(index.column());
+        // Insert temporary image into cache
+        cache.insert(row, new QImage());
+
+        // Request image asynchronously
+        QString path(data(index, Qt::DisplayRole).toString());
+        if (!QMetaObject::invokeMethod(
+                loader,
+                "requestImage",
+                Q_ARG(int, row),
+                Q_ARG(QString, path))) {
+            qCritical() << "Model::data: Invoking remote loader failed";
+        }
+    }
+    return *cache[row];
 }
 
-QImage Model::image(const QModelIndex &index) const
+void Model::onImageLoaded(int row, QImage *image)
 {
-    if (!index.isValid())
-        return QImage();
-    Item *item = static_cast<Item *>(index.internalPointer());
-    return item->image();
+    qDebug() << "Model::onImageLoaded" << row;
+    cache.insert(row, image);
+    QModelIndex i = index(row);
+    emit dataChanged(i, i);
 }
 
-QModelIndex Model::index(int row, int column, const QModelIndex &parent)
-        const
+void Model::setupModelData(const QString &root)
 {
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    Item *parentItem;
-
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<Item*>(parent.internalPointer());
-
-    Item *childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(row, column, childItem);
-    else
-        return QModelIndex();
-}
-
-QModelIndex Model::parent(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return QModelIndex();
-
-    Item *childItem = static_cast<Item*>(index.internalPointer());
-    Item *parentItem = childItem->parent();
-
-    if (parentItem == rootItem)
-        return QModelIndex();
-
-    return createIndex(parentItem->row(), 0, parentItem);
-}
-
-int Model::rowCount(const QModelIndex &parent) const
-{
-    Item *parentItem;
-    if (parent.column() > 0)
-        return 0;
-
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<Item*>(parent.internalPointer());
-
-    return parentItem->childCount();
-}
-
-void Model::setupModelData(const QString &root, Item *parent)
-{
+    QStringList items;
     QDir rootDir(root);
     QFileInfoList entries = rootDir.entryInfoList();
 
@@ -107,7 +76,8 @@ void Model::setupModelData(const QString &root, Item *parent)
         if (relName.endsWith(".") || relName.endsWith("..")) {
             continue;
         }
-        Item *item = new Item(absName, parent);
-        parent->appendChild(item);
+        items.append(absName);
     }
+
+    setStringList(items);
 }

@@ -12,11 +12,13 @@ void Delegate::paint(QPainter *painter,
     painter->setBrush(QBrush(Qt::white));
     painter->setPen(QPen(Qt::gray));
     painter->drawRect(option.rect);
+
     const Model *model = qobject_cast<const Model *>(index.model());
     if (model) {
-        int sourceY = model->image(index).height()/2 - option.rect.height()/2;
+        QImage image = model->data(index, Model::ImageRole).value<QImage>();
+        int sourceY = image.height() / 2 - option.rect.height() / 2;
         painter->drawImage(option.rect.x(), option.rect.y(),
-                           model->image(index), 0, sourceY);
+                           image, 0, sourceY);
     }
 }
 
