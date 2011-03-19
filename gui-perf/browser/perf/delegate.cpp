@@ -20,9 +20,10 @@ void Delegate::paint(QPainter *painter,
         painter->drawImage(option.rect.x(), option.rect.y(),
                            image, 0, sourceY);
 
-        QString label = model->data(index, Qt::DisplayRole).toString();
+        QString label = QString().setNum(index.row());
         QFont font = painter->font();
-        font.setPixelSize(22);
+        font.setPixelSize(48);
+        font.setBold(true);
         painter->setFont(font);
         painter->setPen(QPen(Qt::black));
         painter->drawText(option.rect.x() + 21, option.rect.y() + 181, label);

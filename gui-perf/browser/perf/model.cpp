@@ -7,8 +7,8 @@
 #include "model.h"
 #include "loader.h"
 
-const int WINDOW = 20;
-static QCache<int, QImage> cache(2 * WINDOW);
+const int BATCH = 10;
+static QCache<int, QImage> cache(2 * BATCH);
 static QList<QModelIndex> requests;
 
 Model::Model(const QString &root, QObject *parent): QStringListModel(parent)
@@ -17,10 +17,10 @@ Model::Model(const QString &root, QObject *parent): QStringListModel(parent)
     loader = new Loader(parent);
     connect(loader, SIGNAL(loadedImage(int, QImage *)),
             this, SLOT(onImageLoaded(int, QImage *)));
-    timerId = startTimer(500);
     loader->moveToThread(&loaderThread);
     loaderThread.start();
     loaderThread.setPriority(QThread::LowestPriority);
+    timerId = startTimer(500);
 }
 
 Model::~Model()
@@ -30,23 +30,44 @@ Model::~Model()
 
 QVariant Model::data(const QModelIndex &i, int role) const
 {
-    if (role != Model::ImageRole) {
-        return QStringListModel::data(i, role);
-    }
+    // Requesting data for invalid index
     if (!i.isValid()) {
         return QVariant();
     }
 
+    // Requesting non-image data
+    if (role != Model::ImageRole) {
+        return QStringListModel::data(i, role);
+    }
+
+    // Requesting image data
+
     int row = i.row();
+
+    // If image is in the cache, serve it from there
     if (cache.contains(row)) {
         return *cache[row];
     }
+
+    // Otherwise, clear outstanding requests, and add request for current row,
+    // and some more around it
     requests.clear();
-    requests.append(i);
-    for (int j = 0; j < WINDOW; j++) {
-        requests.append(index(row - WINDOW / 2 + j));
+    for (int j = 0; j < BATCH; j++) {
+        requests.append(index(row - BATCH / 2 + j));
     }
-    return *cache[row];
+    return QImage();
+}
+
+void Model::timerEvent(QTimerEvent *e)
+{
+    if (e->timerId() != timerId) {
+        return;
+    }
+
+    foreach (QModelIndex i, requests) {
+        requestImage(i);
+    }
+    requests.clear();
 }
 
 void Model::requestImage(const QModelIndex &i) const
@@ -76,18 +97,6 @@ void Model::onImageLoaded(int row, QImage *image)
     cache.insert(row, image);
     QModelIndex i = index(row);
     emit dataChanged(i, i);
-}
-
-void Model::timerEvent(QTimerEvent *e)
-{
-    if (e->timerId() != timerId) {
-        return;
-    }
-
-    foreach (QModelIndex i, requests) {
-        requestImage(i);
-    }
-    requests.clear();
 }
 
 void Model::setupModelData(const QString &root)

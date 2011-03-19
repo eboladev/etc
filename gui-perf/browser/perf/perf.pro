@@ -9,8 +9,6 @@ HEADERS += \
     delegate.h \
     loader.h
 
-RESOURCES += \
-    resources.qrc
+RESOURCES +=
 
-OTHER_FILES += \
-    generic.jpg
+OTHER_FILES +=
