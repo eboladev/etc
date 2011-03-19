@@ -10,7 +10,7 @@ void Delegate::paint(QPainter *painter,
                      const QModelIndex &index) const
 {
     painter->setBrush(QBrush(Qt::white));
-    painter->setPen(QPen(Qt::gray));
+    // painter->setPen(QPen(Qt::gray));
     painter->drawRect(option.rect);
     const Model *model = qobject_cast<const Model *>(index.model());
     if (model) {
