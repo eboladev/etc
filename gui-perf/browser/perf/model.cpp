@@ -7,7 +7,7 @@
 #include "model.h"
 #include "loader.h"
 
-const int BATCH = 10;
+const int BATCH = 12;
 static QCache<int, QImage> cache(2 * BATCH);
 static QList<QModelIndex> requests;
 
@@ -95,6 +95,7 @@ void Model::requestImage(const QModelIndex &i) const
 
 void Model::onImageLoaded(int row, QImage *image)
 {
+    qDebug() << "Model::onImageLoaded" << row;
     cache.insert(row, image);
     QModelIndex i = index(row);
     emit dataChanged(i, i);
