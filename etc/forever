@@ -1,0 +1,4 @@
+#!/bin/sh
+while true; do
+	cat /etc/profile
+done

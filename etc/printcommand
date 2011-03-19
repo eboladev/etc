@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# Name		printcommand
+# Author	Akos Polster, Hewlett-Packard Hungary
+# Description	Print command for Samba
+# Comments	Performs job redirection if the printer name occurs
+#		in the redirection file /usr/local/samba/lib/predir.
+#		Otherwise prints to the default printer. 
+#		The syntax of the predir file is:
+#		  <samba printer 1> <unix printer 1>
+#		  <samba printer 2> <unix printer 2>
+#		  ...
+
+# Check command line
+if [ $# -lt 2 ]; then
+	echo "printcommand: Usage: printcommand printer file [ ... ]" >&2
+	exit 1
+fi
+
+predir=/usr/local/samba/lib/predir
+printer=$1
+file=$2
+awkProg='
+$1 == printer	{printer = $2; exit 0}
+END		{print printer}
+'
+
+if [ -f $predir ]; then
+	printer=`awk "$awkProg" printer=$printer $predir`
+fi
+
+echo lp -oraw -onb -d$printer $file
+rm -f $file
+
+#
+# End		printcommand
+#
+

@@ -1,0 +1,22 @@
+<html>
+<head><title>Variables Demo</title></head>
+<body>
+
+<script>
+var myGlobal = "boo";
+
+function myFunction() {
+    var myLocal = new Array(2);
+    myLocal[0] = "hello";
+    myLocal[1] = "world";
+    myGlobal = myLocal;
+    delete myLocal;
+}
+
+myFunction();
+alert(myGlobal[0] + " " + myGlobal[1]);
+</script>
+
+</body>
+</html>
+

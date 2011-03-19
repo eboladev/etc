@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>WebGL Demo</title>
+
+<script id="vertexshader" type="x-shader/x-vertex">
+attribute vec2 position;
+attribute vec2 texcoord;
+uniform float h;
+varying vec2 tc;
+
+void main()
+{
+	gl_Position=vec4(position,0.0,1.0);
+	tc=vec2(position.x,position.y*h);
+}
+</script>
+
+<script id="fragmentshader" type="x-shader/x-fragment">
+uniform float t;
+varying vec2 tc;
+
+const float BLOWUP=66.0; /* 86.0 */
+const float MAXSTEPSHIFT=8.0; /* 6.0 */
+const int MAXITERS=34; /* 26 */
+
+const float pi=3.1415926535;
+
+float sum(vec3 v) { return v.x+v.y+v.z; }
+
+int func(vec3 pos,float stepshift)
+{
+	vec3 v2=abs(fract(pos)-vec3(0.5,0.5,0.5))/2.0;
+	float r=0.0769*sin(t*-0.0708);
+	float blowup=BLOWUP/pow(2.0,stepshift+8.0);
+
+	if(sum(v2)-0.1445+r<blowup) return 1;
+	v2=vec3(0.25,0.25,0.25)-v2;
+	if(sum(v2)-0.1445-r<blowup) return 2;
+
+	int hue;
+	float width;
+	if(abs(sum(v2)-3.0*r-0.375)<0.03846)
+	{
+		width=0.1445;
+		hue=4;
+	}
+	else
+	{
+		width=0.0676;
+		hue=3;
+	}
+
+	if(sum(abs(v2.zxy-v2.xyz))-width<blowup) return hue;
+
+	return 0;
+}
+
+void main()
+{
+	float x=tc.x*0.5;
+	float y=tc.y*0.5;
+
+	float sin_a=sin(t*0.00564);
+	float cos_a=cos(t*0.00564);
+
+	vec3 dir=vec3(x,-y,0.33594-x*x-y*y);
+	dir=vec3(dir.y,dir.z*cos_a-dir.x*sin_a,dir.x*cos_a+dir.z*sin_a);
+	dir=vec3(dir.y,dir.z*cos_a-dir.x*sin_a,dir.x*cos_a+dir.z*sin_a);
+	dir=vec3(dir.y,dir.z*cos_a-dir.x*sin_a,dir.x*cos_a+dir.z*sin_a);
+
+	vec3 pos=vec3(0.5,1.1875,0.875)+vec3(1.0,1.0,1.0)*0.0134*t;
+
+	float stepshift=MAXSTEPSHIFT;
+
+	if(fract(pow(x,y)*t*1000.0)>0.5) pos+=dir/pow(2.0,stepshift);
+	else pos-=dir/pow(2.0,stepshift);
+
+	int i=0;
+	int c;
+	do
+	{
+		c=func(pos,stepshift);
+		if(c>0)
+		{
+			stepshift+=1.0;
+			pos-=dir/pow(2.0,stepshift);
+		}
+		else
+		{
+			if(stepshift>0.0) stepshift-=1.0;
+			pos+=dir/pow(2.0,stepshift);
+			i++;
+		}
+	}
+	while(stepshift<MAXSTEPSHIFT&&i<MAXITERS);
+
+
+	vec3 col;
+	if(c==0) col=vec3(0.0,0.0,0.0);
+	else if(c==1) col=vec3(1.0,0.5,0.0);
+	else if(c==2) col=vec3(0.0,1.0,0.0);
+	else if(c==3) col=vec3(1.0,1.0,1.0);
+	else if(c==4) col=vec3(0.5,0.5,0.5);
+
+	gl_FragColor=vec4(col*(1.0-(float(i)-stepshift)/32.0),1.0);
+}
+</script>
+
+<script type="text/javascript">
+
+var vertexshader,fragmentshader,program;
+var texture,vertices,indices;
+
+function get_context(canvas)
+{
+	var gl;
+	try { gl=canvas.getContext("webkit-3d"); } catch(e) {}
+	if(!gl) try { gl=canvas.getContext("moz-webgl"); } catch(e) {}
+	return gl;
+}
+
+function load_shader(gl,id,type)
+{
+	var shader_el=document.getElementById(id);
+	var shader=gl.createShader(type);
+	if(!shader) return null;
+	gl.shaderSource(shader,shader_el.text);
+	gl.compileShader(shader);
+	if(!gl.getShaderi(shader,gl.COMPILE_STATUS))
+	{
+		console.log("Error compiling shader: "+gl.getShaderInfoLog(shader));
+		return null;
+	}
+	return shader;
+}
+
+function reshape(canvas,gl,w,h)
+{
+	gl.viewport(0,0,w,h);
+	gl.uniform1f(gl.getUniformLocation(program,"h"),h/w);
+}
+
+function init()
+{
+	var canvas=document.getElementById("canvas");
+	var gl=get_context(canvas);
+
+	vertexshader=load_shader(gl,"vertexshader",gl.VERTEX_SHADER);
+	if(!vertexshader) return null;
+
+	fragmentshader=load_shader(gl,"fragmentshader",gl.FRAGMENT_SHADER);
+	if(!fragmentshader) return null;
+
+	program=gl.createProgram();
+	if(!program) return null;
+
+	gl.attachShader(program,vertexshader);
+	gl.attachShader(program,fragmentshader);
+
+	gl.bindAttribLocation(program,0,"position");
+
+	gl.linkProgram(program);
+
+	if(!gl.getProgrami(program,gl.LINK_STATUS))
+	{
+		console.log("Error in program linking:"+gl.getProgramInfoLog(program));
+		return null;
+	}
+
+	gl.useProgram(program);
+
+	reshape(canvas,gl,canvas.clientWidth,canvas.clientHeight);
+
+	gl.enableVertexAttribArray(0);
+
+	vertices=gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER,vertices);
+	gl.bufferData(gl.ARRAY_BUFFER,new CanvasFloatArray([
+		-1,-1,  -1,1,  1,-1, 1,1,
+	]),gl.STATIC_DRAW);
+	gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+
+	indices=gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indices);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new CanvasUnsignedShortArray([
+		0,1,2,3
+	]),gl.STATIC_DRAW);
+
+	return gl;
+}
+
+function draw(gl,t)
+{
+	gl.uniform1f(gl.getUniformLocation(program,"t"),t);
+	gl.drawElements(gl.TRIANGLE_STRIP,4,gl.UNSIGNED_SHORT,0);
+	gl.flush();
+}
+
+function start()
+{
+	var gl=init();
+	if(!gl) return;
+
+	var start=new Date().getTime();
+	var times=[start,start,start,start,start,start,start,start,start,start,start,start];
+	var i=0;
+
+	draw(gl);
+	setInterval(function() {
+		var timestamp=new Date().getTime();
+		draw(gl,(timestamp-start)/1000.0*30);
+
+		times[i%times.length]=timestamp;
+		var fps=1000*(times.length-1)/(timestamp-times[(i+1)%times.length]);
+		document.getElementById("fps").innerHTML=Math.round(fps)+" fps";
+		i++;
+	},10);
+}
+
+function resize(w,h)
+{
+	var canvas=document.getElementById("canvas");
+	var gl=get_context(canvas);
+
+	canvas.setAttribute("width",w+"px");
+	canvas.setAttribute("height",h+"px");
+	reshape(canvas,gl,w,h);
+}
+
+</script>
+
+<style type="text/css">
+#warning {
+	width:70%;
+	margin: 1em auto;
+	padding: 1em;
+	background: #fee;
+	border: 2px solid #fcc;
+	color: #700;
+	font-family: sans-serif;
+	font-size: 85%;
+	text-align: left;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+}
+
+#effect {
+	text-align: center;
+	font-family: sans-serif;
+}
+#controls a {
+	color: #444;
+	padding: 3px 8px;
+	text-decoration: none;
+}
+#controls a:hover {
+	font-family: sans-serif;
+	background: #aaa;
+	color: #555;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+</style>
+
+</head>
+
+<body onload="start()">
+
+<h1>WebGL Demo</h1>
+
+<div id="content">
+
+<div id="effect">
+<canvas id="canvas" width="320" height="240" style="border: 2px solid black"></canvas>
+<div id="fps"></div>
+</div>
+
+<p>This is a port of <a href="http://rrrola.wz.cz/">&#344;r&#345;ola's</a> "Puls" to WebGL by Dag Aagren.</p>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+#!/bin/bash
+#\
+exec tclsh "$0" ${1+"$@"}
+
+set visited {}
+
+while 1 {
+  foreach f [glob -nocomplain -- "~/tmp/*"] {
+    if {-1 == [lsearch -exact $visited $f]} {
+      lappend visited $f
+      puts $f
+      catch {exec xv $f}
+    }
+  }
+  after 2000
+}

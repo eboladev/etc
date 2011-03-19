@@ -1,0 +1,32 @@
+#!/bin/ksh
+#
+# Name		instver
+# Description	Install file, replace string "__EXPERIMENTAL__" with 
+# 		a given version string
+# Author	Akos Polster, Response Center, Hewlett-Packard Hungary
+# Version	__EXPERIMENTAL__
+# Revision	$Header: instver,v 1.3 96/05/09 16:02:20 akos Exp $
+# Source	file://marzipan.hungary/~akos/src/scripts/instver
+#
+
+if [ $# != 6 ] 
+then
+	echo "instver: Usage: instver version mode user group src dst" >&2
+	exit 1
+fi
+
+version="$1"
+mode="$2"
+user="$3"
+group="$4"
+src="$5"
+dst="$6"
+
+rm -f $dst
+sed "s|__EXPERIMENTAL__|$version|g" $src > $dst
+chmod $mode $dst
+chown ${user}:${group} $dst
+
+#
+# End		instver
+#

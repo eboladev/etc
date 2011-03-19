@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# Name		pentek
+# Description	Mesure and display Elisa data
+# Author	Akos Polster
+# Version	2.0.0
+# Revision	$Id: pentek,v 1.2 2002/01/10 19:12:35 polster Exp $
+#
+
+exec wish ${PENTEKLIB:-/opt/pentek/lib}/pentek.tcl $@
+
+#
+# End		pentek
+#

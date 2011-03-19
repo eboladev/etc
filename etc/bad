@@ -1,0 +1,19 @@
+#!/bin/sh
+# \
+exec /opt/activetcl/bin/wish "$0" ${1+"$@"}
+
+lappend ::auto_path /home/sim96/lib/tools
+package require DpTcl
+package require TTT
+package require Itcl
+package require Itk
+package require Iwidgets
+package require BWidget
+package require Img
+if {[catch {package require Tclx}]} {
+    puts stderr "gobcad: Warning: Running with TclX emulation"
+    source /home/sim96/lib/tools/tclxemu.tcl
+}
+
+tk_getOpenFile
+exit

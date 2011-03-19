@@ -1,0 +1,25 @@
+proc lastmatch {s p} {
+
+  set source $s
+  set offset 0
+  set matchFirst -1
+  set matchLast -1
+  set matchString ""
+
+  while {[regexp -indices -- $p $source match]} {
+    set first [lindex $match 0]
+    set last [lindex $match 1]
+    set next [expr {$last + 1}]
+    set matchFirst [expr {$first + $offset}]
+    set matchLast [expr {$last + $offset}]
+    set matchString [string range $s $matchFirst $matchLast]
+    set source [string range $source $next end]
+    if {[string compare "" $source]} {
+      incr offset $next
+    } else {
+      break
+    }
+  }
+
+  return [list $matchFirst $matchLast $matchString]
+}

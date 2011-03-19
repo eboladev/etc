@@ -1,0 +1,39 @@
+On Fri, 2006-07-14 at 08:58 +0200, Joachim Schmitz wrote:
+> Roché Compaan schrieb:
+> >
+> > If you have common add/edit methods in your app used by all of your
+> > classes, you could do application level replication between Zopes. We
+> > have written a small replication module for on of our apps that copes
+> > extremely well with disconnected Zopes, and replicates a very compact
+> > serialisation of commands to each other (as opposed to whole objects).
+> > And they replicate both ways. We been using it for about 4 years in
+> > production now.
+> >
+> > I could send you an example if you want to evaluate this route.
+> >
+> could you post it to the list, cause that would be very interesting for
+> us too.
+
+No problem, but remember this is app specific and still works with the
+ZODB distributed with Zope 2.7.
+
+In summary, it works like this:
+
+There are 3 classes: ReplicationLog, ReplicationTarget and
+ReplogTransaction.
+
+You add a ReplicationLog to your Zope app and add ReplicationTarget
+instances inside it. You log transactions to a ReplicationLog by calling
+it's "log" method e.g:
+
+self.ReplicationLog.log(object, 'manage_edit', {'x': 1, 'y': 2})
+
+where the first arg is the object, second arg is the method and the last
+arg is mapping of values that should change.
+
+The ReplicationLog serialises arguments in '_serialise_args' and this
+will be the app specific part. You will for instance notice that we have
+a special serialisation for something we call a "reference".
+
+A cron job calls replicate on your ReplicationLog instance.
+

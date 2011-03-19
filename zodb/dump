@@ -1,0 +1,4 @@
+#!/bin/sh
+
+export PYTHONPATH=~/workspace/vanido/LocalClientProto/trunk/src
+exec python dump.py

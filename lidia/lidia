@@ -1,0 +1,77 @@
+#!/bin/sh
+# -*- Mode: Tcl -*-
+#
+#\
+exec wish $0
+
+package require Img
+
+set text {5 4 3 2 1 L I D I A}
+set len [llength $text]
+
+foreach t $text {
+    set pm($t) [image create photo -format xpm -file $t.xpm]
+}
+
+wm withdraw .
+wm resizable . 0 0
+. configure -bg black
+pack [canvas .c -width 500 -height 500 -bg black -bd 0 -highlightthickness 0] \
+    -anchor center
+update
+wm deiconify .
+
+set a1 [.c create oval 20 20 480 480 -width 10 -outline PaleVioletRed4  \
+	    -fill "" -tags arc]
+set a2 [.c create oval 40 40 460 460 -width  5 -outline PaleVioletRed4 \
+	    -fill "" -tags arc]
+set a3 [.c create arc 100 100 400 400 -fill gray20 -outline "" \
+	    -style pieslice]
+set img [.c create image 250 250 -anchor c]
+.c raise $img all
+
+set j 0
+
+while 1 {
+    set letter [lindex $text $j]
+    .c itemconfigure $img -image $pm($letter)
+
+    for {set i 0} {$i <= 360} {incr i 10} {
+    	# .c itemconfigure arc -extent $i
+    	.c itemconfigure $a3 -extent [expr {360 - $i}]
+    	update idletasks
+    	after 30
+    }
+
+    incr j
+    if {$j == $len} {
+    	# .c itemconfigure arc -state hidden
+    	.c itemconfigure $a3 -state hidden
+    	foreach n {1 2 3 4 5} {
+    	    foreach l $text {
+        		.c itemconfigure $img -image $pm($l)
+        		update
+        		after 30
+    	    }
+    	}
+    	.c itemconfigure $a2 -width 1
+    	foreach n {1 2 3} {
+    	    for {set i 0} {$i < 150} {incr i 10} {
+        		.c coords $a2 [expr {40 + $i}] [expr {40 + $i}] \
+        		    [expr {460 - $i}] [expr {460 - $i}]
+        		update
+                after 30
+    	    }
+    	    for {set i 149} {$i >= 0} {incr i -10} {
+        		.c coords $a2 [expr {40 + $i}] [expr {40 + $i}] \
+        		    [expr {460 - $i}] [expr {460 - $i}]
+        		update
+                after 30
+    	    }
+    	}
+    	.c itemconfigure $a2 -width 5
+    					
+    	.c itemconfigure $a3 -state normal
+    	set j 0
+    }
+}
