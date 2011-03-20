@@ -1,18 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>flower-0.png</file>
-        <file>flower-1.png</file>
-        <file>flower-2.png</file>
-        <file>flower-3.png</file>
-        <file>flower-4.png</file>
-        <file>flower-5.png</file>
-        <file>flower-6.png</file>
-        <file>flower-7.png</file>
-        <file>flower-8.png</file>
-        <file>flower-9.png</file>
-        <file>flower-10.png</file>
-        <file>flower-11.png</file>
-        <file>flower-12.png</file>
-        <file>flower-13.png</file>
+        <file>emilio.gif</file>
     </qresource>
 </RCC>
