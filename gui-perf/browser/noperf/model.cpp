@@ -2,102 +2,53 @@
 #include <QDir>
 #include <QFile>
 #include <QDebug>
+#include <QCache>
 
-#include "item.h"
 #include "model.h"
 
-Model::Model(const QString &root, QObject *parent): QAbstractItemModel(parent)
+const int BATCH = 18;
+static QCache<int, QImage> cache(50);
+
+Model::Model(const QString &root, QObject *parent): QStringListModel(parent)
 {
-    qDebug() << "Model::Model" << root;
-    QString rootData("Name");
-    rootItem = new Item(rootData);
-    setupModelData(root, rootItem);
+    setupModelData(root);
 }
 
 Model::~Model()
 {
-    delete rootItem;
 }
 
-int Model::columnCount(const QModelIndex &parent) const
+QVariant Model::data(const QModelIndex &i, int role) const
 {
-    if (parent.isValid()) {
-        return 0;
-    } else {
-        return 1;
+    // Requesting data for invalid index
+    if (!i.isValid()) {
+        return QVariant();
     }
+
+    // Requesting non-image data
+    if (role != Model::ImageRole) {
+        return QStringListModel::data(i, role);
+    }
+
+    // Requesting image data
+
+    int row = i.row();
+
+    // If image is in the cache, serve it from there
+    if (cache.contains(row)) {
+        return *cache[row];
+    }
+
+    // Otherwise, load image from file
+    QString path(data(i, Qt::DisplayRole).toString());
+    QImage *image = new QImage(path);
+    cache.insert(row, image);
+    return *image;
 }
 
-QVariant Model::data(const QModelIndex &index, int role) const
+void Model::setupModelData(const QString &root)
 {
-    if (!index.isValid())
-        return QVariant();
-
-    if (role != Qt::DisplayRole)
-        return QVariant();
-
-    Item *item = static_cast<Item*>(index.internalPointer());
-    return item->data(index.column());
-}
-
-QImage Model::image(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return QImage();
-    Item *item = static_cast<Item *>(index.internalPointer());
-    return item->image();
-}
-
-QModelIndex Model::index(int row, int column, const QModelIndex &parent)
-        const
-{
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    Item *parentItem;
-
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<Item*>(parent.internalPointer());
-
-    Item *childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(row, column, childItem);
-    else
-        return QModelIndex();
-}
-
-QModelIndex Model::parent(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return QModelIndex();
-
-    Item *childItem = static_cast<Item*>(index.internalPointer());
-    Item *parentItem = childItem->parent();
-
-    if (parentItem == rootItem)
-        return QModelIndex();
-
-    return createIndex(parentItem->row(), 0, parentItem);
-}
-
-int Model::rowCount(const QModelIndex &parent) const
-{
-    Item *parentItem;
-    if (parent.column() > 0)
-        return 0;
-
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<Item*>(parent.internalPointer());
-
-    return parentItem->childCount();
-}
-
-void Model::setupModelData(const QString &root, Item *parent)
-{
+    QStringList items;
     QDir rootDir(root);
     QFileInfoList entries = rootDir.entryInfoList();
 
@@ -107,7 +58,8 @@ void Model::setupModelData(const QString &root, Item *parent)
         if (relName.endsWith(".") || relName.endsWith("..")) {
             continue;
         }
-        Item *item = new Item(absName, parent);
-        parent->appendChild(item);
+        items.append(absName);
     }
+
+    setStringList(items);
 }

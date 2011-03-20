@@ -33,6 +33,7 @@ private:
     Loader *loader;
     LoaderThread loaderThread;
     int timerId;
+    QImage defaultImage;
 };
 
 #endif // MODEL_H

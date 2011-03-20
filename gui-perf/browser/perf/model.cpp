@@ -11,7 +11,8 @@ const int BATCH = 18;
 static QCache<int, QImage> cache(50);
 static QList<QModelIndex> requests;
 
-Model::Model(const QString &root, QObject *parent): QStringListModel(parent)
+Model::Model(const QString &root, QObject *parent):
+    QStringListModel(parent), defaultImage(":/image.png")
 {
     setupModelData(root);
     loader = new Loader(parent);
@@ -45,18 +46,16 @@ QVariant Model::data(const QModelIndex &i, int role) const
 
     int row = i.row();
 
-    // If image is in the cache, serve it from there
-    if (cache.contains(row)) {
-        return *cache[row];
-    }
-
-    // Otherwise, clear outstanding requests, and add request for current row,
-    // and some more around it
+    // Clear outstanding requests, and add request for current row,
+    // plus some more around it
     requests.clear();
     for (int j = BATCH - 1; j >= 0; j--) {
         requests.append(index(row - BATCH / 2 + j));
     }
-    return QImage();
+
+    // If image is in the cache, serve it from there. Otherwise return a
+    // default image
+    return cache.contains(row)? *cache[row]: defaultImage;
 }
 
 void Model::timerEvent(QTimerEvent *e)
@@ -81,7 +80,7 @@ void Model::requestImage(const QModelIndex &i) const
         qDebug() << "Model::requestImage" << row;
 
         // Insert temporary image into cache
-        cache.insert(row, new QImage());
+        cache.insert(row, new QImage(":/image.png"));
 
         // Request image asynchronously from loader service
         QString path(data(i, Qt::DisplayRole).toString());

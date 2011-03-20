@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    Model model(QDir::homePath() + "/Pictures/gui-perf");
+    Model model(QDir::homePath() + "/Dropbox/Documents/pb/gui-perf");
 
     QListView view;
     view.setModel(&model);

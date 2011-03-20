@@ -1,34 +1,26 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <QAbstractItemModel>
-
-#include <QAbstractItemModel>
+#include <QStringListModel>
 #include <QModelIndex>
 #include <QVariant>
+#include <QImage>
+#include <QList>
 
-class Item;
-
-class Model: public QAbstractItemModel
+class Model: public QStringListModel
 {
     Q_OBJECT
 
 public:
+    enum {
+        ImageRole = Qt::UserRole + 1,
+    };
     Model(const QString &root, QObject *parent = 0);
-    ~Model();
-
+    virtual ~Model();
     QVariant data(const QModelIndex &index, int role) const;
-    QModelIndex index(int row, int column,
-                      const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QImage image(const QModelIndex &index) const;
 
 private:
-    void setupModelData(const QString &root, Item *parent);
-
-    Item *rootItem;
+    void setupModelData(const QString &root);
 };
 
 #endif // MODEL_H

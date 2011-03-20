@@ -8,14 +8,14 @@ class Delegate: public QItemDelegate
     Q_OBJECT
 
 public:
-    Delegate(QObject *parent = 0);
-    // bool hasParent(const QModelIndex &index) const;
-    // bool isLast(const QModelIndex &index) const;
+    Delegate(QObject *parent = 0): QItemDelegate(parent) {
+    }
+    QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const {
+        return QSize(800, 200);
+    }
     void paint(QPainter *painter,
                const QStyleOptionViewItem &option,
                const QModelIndex &index) const;
-    QSize sizeHint(const QStyleOptionViewItem &option,
-                   const QModelIndex &index) const;
 };
 
 #endif // DELEGATE_H
