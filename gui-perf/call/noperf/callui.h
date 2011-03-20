@@ -15,7 +15,6 @@ signals:
 
 public slots:
     void callComing();
-    void translateNumber();
 
 private:
     PhoneBook *phoneBook;

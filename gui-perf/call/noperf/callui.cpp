@@ -25,11 +25,6 @@ void CallUi::callComing()
 {
     line1->setText("Incoming call:");
     line2->setText("562-756-2233");
-    QTimer::singleShot(500, this, SLOT(translateNumber()));
-}
-
-void CallUi::translateNumber()
-{
     QString name = phoneBook->matchNumber("562-756-2233");
     line2->setText(name);
 }
