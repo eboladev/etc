@@ -8,8 +8,9 @@ public:
     static void msleep(unsigned long msecs) {QThread::msleep(msecs);}
 };
 
-QString PhoneBook::matchNumber(const QString &)
+void PhoneBook::matchNumber(const QString &)
 {
-    Sleeper::msleep(2000); // Simulate long processing
-    return QString("Hale Berry");
+    Sleeper::msleep(3000); // Simulate long processing
+    QString name("Hale Berry");
+    emit numberMatched(name);
 }

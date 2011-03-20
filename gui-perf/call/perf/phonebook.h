@@ -2,6 +2,7 @@
 #define PHONEBOOK_H
 
 #include <QObject>
+#include <QThread>
 
 class PhoneBook: public QObject
 {
@@ -9,12 +10,20 @@ class PhoneBook: public QObject
 
 public:
     explicit PhoneBook(QObject *parent = 0): QObject(parent) {}
-    QString matchNumber(const QString &number);
-
-signals:
 
 public slots:
+    void matchNumber(const QString &number);
 
+signals:
+    void numberMatched(QString name);
+};
+
+class PhoneBookThread: public QThread
+{
+public:
+    void run() {
+        exec();
+    }
 };
 
 #endif // PHONEBOOK_H

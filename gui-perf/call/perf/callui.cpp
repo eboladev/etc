@@ -6,7 +6,7 @@
 
 CallUi::CallUi(QWidget *parent): QWidget(parent)
 {
-    phoneBook = new PhoneBook(this);
+    phoneBook = new PhoneBook();
     animation = new QLabel(this);
     line1 = new QLabel(" ", this);
     line2 = new QLabel(" ", this);
@@ -18,18 +18,35 @@ CallUi::CallUi(QWidget *parent): QWidget(parent)
     QMovie *movie = new QMovie(":/emilio.gif", QByteArray(), this);
     animation->setMovie(movie);
     movie->start();
+
+    connect(phoneBook, SIGNAL(numberMatched(QString)),
+            this, SLOT(onNumberMatched(QString)));
+    phoneBook->moveToThread(&phoneBookThread);
+    phoneBookThread.start();
+    phoneBookThread.setPriority(QThread::LowestPriority);
+
     QTimer::singleShot(3000, this, SLOT(callComing()));
+}
+
+CallUi::~CallUi()
+{
+    phoneBookThread.quit();
+    phoneBookThread.wait();
+    delete phoneBook;
 }
 
 void CallUi::callComing()
 {
     line1->setText("Incoming call:");
     line2->setText("562-756-2233");
-    QTimer::singleShot(500, this, SLOT(translateNumber()));
+
+    // Request number matching from phone book
+    QMetaObject::invokeMethod(phoneBook,
+                              "matchNumber",
+                              Q_ARG(QString, "562-756-2233"));
 }
 
-void CallUi::translateNumber()
+void CallUi::onNumberMatched(QString name)
 {
-    QString name = phoneBook->matchNumber("562-756-2233");
     line2->setText(name);
 }

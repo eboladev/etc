@@ -8,20 +8,23 @@
 class CallUi : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit CallUi(QWidget *parent = 0);
+    virtual ~CallUi();
 
 signals:
 
 public slots:
     void callComing();
-    void translateNumber();
+    void onNumberMatched(QString name);
 
 private:
     PhoneBook *phoneBook;
     QLabel *animation;
     QLabel *line1;
     QLabel *line2;
+    PhoneBookThread phoneBookThread;
 };
 
 #endif // CALLUI_H
