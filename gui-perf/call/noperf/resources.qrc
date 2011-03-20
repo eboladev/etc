@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>emilio.gif</file>
+    </qresource>
+</RCC>
