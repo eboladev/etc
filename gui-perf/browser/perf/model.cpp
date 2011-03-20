@@ -7,8 +7,8 @@
 #include "model.h"
 #include "loader.h"
 
-const int BATCH = 12;
-static QCache<int, QImage> cache(2 * BATCH);
+const int BATCH = 18;
+static QCache<int, QImage> cache(50);
 static QList<QModelIndex> requests;
 
 Model::Model(const QString &root, QObject *parent): QStringListModel(parent)
@@ -20,7 +20,7 @@ Model::Model(const QString &root, QObject *parent): QStringListModel(parent)
     loader->moveToThread(&loaderThread);
     loaderThread.start();
     loaderThread.setPriority(QThread::LowestPriority);
-    timerId = startTimer(500);
+    timerId = startTimer(10);
 }
 
 Model::~Model()
@@ -53,7 +53,7 @@ QVariant Model::data(const QModelIndex &i, int role) const
     // Otherwise, clear outstanding requests, and add request for current row,
     // and some more around it
     requests.clear();
-    for (int j = 0; j < BATCH; j++) {
+    for (int j = BATCH - 1; j >= 0; j--) {
         requests.append(index(row - BATCH / 2 + j));
     }
     return QImage();
@@ -65,10 +65,10 @@ void Model::timerEvent(QTimerEvent *e)
         return;
     }
 
-    foreach (QModelIndex i, requests) {
-        requestImage(i);
+    // Take last request from request queue
+    if (!requests.empty()) {
+        requestImage(requests.takeLast());
     }
-    requests.clear();
 }
 
 void Model::requestImage(const QModelIndex &i) const
