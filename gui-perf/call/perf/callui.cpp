@@ -5,7 +5,9 @@
 CallUi::CallUi(QWidget *parent): QLabel(parent), frame(0)
 {
     setText("Ring ring");
-    timerId = startTimer(90);
+    timerId = startTimer(50);
+    setStyleSheet("background-color: black;");
+    setAlignment(Qt::AlignCenter);
 }
 
 void CallUi::timerEvent(QTimerEvent *e)
@@ -15,7 +17,7 @@ void CallUi::timerEvent(QTimerEvent *e)
     }
 
     setPixmap(QPixmap(QString(":/flower-%1.png").arg(frame++)));
-    if (frame > 20) {
+    if (frame > 13) {
         frame = 0;
     }
 }

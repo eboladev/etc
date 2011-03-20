@@ -15,7 +15,6 @@ OTHER_FILES += \
     flower-17.png \
     flower-16.png \
     flower-15.png \
-    flower-14.png \
     flower-13.png \
     flower-12.png \
     flower-11.png \
