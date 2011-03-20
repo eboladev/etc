@@ -1,9 +1,11 @@
 SOURCES += \
     main.cpp \
-    callui.cpp
+    callui.cpp \
+    phonebook.cpp
 
 HEADERS += \
-    callui.h
+    callui.h \
+    phonebook.h
 
 RESOURCES += \
     resources.qrc

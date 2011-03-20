@@ -3,7 +3,9 @@
 
 #include <QLabel>
 
-class CallUi : public QLabel
+#include "phonebook.h"
+
+class CallUi : public QWidget
 {
     Q_OBJECT
 public:
@@ -12,13 +14,14 @@ public:
 signals:
 
 public slots:
-
-protected:
-    void timerEvent(QTimerEvent *e);
+    void callComing();
+    void translateNumber();
 
 private:
-    int timerId;
-    int frame;
+    PhoneBook *phoneBook;
+    QLabel *animation;
+    QLabel *line1;
+    QLabel *line2;
 };
 
 #endif // CALLUI_H
