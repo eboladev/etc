@@ -5,6 +5,7 @@ WebView {
     width: 800
     height: 600
     anchors.fill: parent
-    // url: "file:///Users/polster/src/etc/webview-hidden/file"
-    url: "file:///Users/polster/src/etc/webview-hidden/file.html"
+    // url: "file:///Users/polster/src/etc/webview-extension/file"
+    // url: "file:///Users/polster/src/etc/webview-extension/file.html"
+    url: "file:///Users/polster/src/etc/webview-extension/file.unknown"
 }
