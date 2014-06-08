@@ -37,7 +37,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		9631663219433DB6001E49C5 /* mastermind */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = mastermind; path = codemaker; sourceTree = BUILT_PRODUCTS_DIR; };
+		9631663219433DB6001E49C5 /* codemaker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = codemaker; sourceTree = BUILT_PRODUCTS_DIR; };
 		9631663519433DB6001E49C5 /* codemaker.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = codemaker.cpp; path = mastermind/codemaker.cpp; sourceTree = "<group>"; };
 		963166431943DA06001E49C5 /* codebraker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = codebraker; sourceTree = BUILT_PRODUCTS_DIR; };
 		9631664D1943DC96001E49C5 /* response.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = response.h; path = mastermind/response.h; sourceTree = "<group>"; };
@@ -83,7 +83,7 @@
 		9631663319433DB6001E49C5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9631663219433DB6001E49C5 /* mastermind */,
+				9631663219433DB6001E49C5 /* codemaker */,
 				963166431943DA06001E49C5 /* codebraker */,
 			);
 			name = Products;
@@ -106,7 +106,7 @@
 			);
 			name = codemaker;
 			productName = mastermind;
-			productReference = 9631663219433DB6001E49C5 /* mastermind */;
+			productReference = 9631663219433DB6001E49C5 /* codemaker */;
 			productType = "com.apple.product-type.tool";
 		};
 		963166421943DA06001E49C5 /* codebraker */ = {

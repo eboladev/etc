@@ -1,4 +1,5 @@
 #include <string>
+#include <algorithm>
 #include "stdlib.h"
 
 #include "code.h"
@@ -37,40 +38,24 @@ Code Code::random() {
 }
 
 // Respond to a guess
-Response Code::respond(const Code &other) const {
-    int blacks = 0;
-    int whites = 0;
-    enum Match {
-        MatchNone,
-        MatchColor,
-        MatchFull,
-    };
-    Match match[Config::NumPegs];
+Response Code::respond(const Code &guess) const {
+    // Count full matches
+    int fullMatches = 0;
     for (size_t i = 0; i < Config::NumPegs; i++) {
-        match[i] = MatchNone;
+        if (r[i] == guess.r[i]) {
+            fullMatches++;
+        }
+    }
+
+    // Count colour matches
+    int colourMatches = 0;
+    vector<size_t> colourMap = mapColours();
+    vector<size_t> guessColourMap = guess.mapColours();
+    for (size_t i = 0; i < Config::NumColours; i++) {
+        colourMatches += min(colourMap[i], guessColourMap[i]);
     }
     
-    for (size_t i = 0; i < other.r.length(); i++) {
-        if (i == r.length()) {
-            break;
-        }
-        if (r[i] == other.r[i]) {
-            match[i] = MatchFull;
-        } else {
-            size_t index = r.find(other.r[i]);
-            if (index != string::npos && match[index] == MatchNone) {
-                match[index] = MatchColor;
-            }
-        }
-    }
-    for (size_t i = 0; i < Config::NumPegs; i++) {
-        if (match[i] == MatchFull) {
-            blacks++;
-        } else if (match[i] == MatchColor) {
-            whites++;
-        }
-    }
-    return Response(blacks, whites);
+    return Response(fullMatches, colourMatches - fullMatches);
 }
 
 // Get string representation
@@ -81,4 +66,15 @@ string Code::repr() const {
 // Compare
 bool Code::operator==(const Code &other) const {
     return r == other.r;
+}
+
+// Get the colour distribution
+vector<size_t> Code::mapColours() const {
+    vector<size_t> colourMap;
+    for (size_t i = 0; i < Config::NumColours; i++) {
+        char colour = '1' + i;
+        size_t colourCount = count(r.begin(), r.end(), colour);
+        colourMap.push_back(colourCount);
+    }
+    return colourMap;
 }

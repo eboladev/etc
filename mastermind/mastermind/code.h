@@ -1,9 +1,10 @@
 #ifndef mastermind_code_h
 #define mastermind_code_h
 
-#include "response.h"
+#include <vector>
 
 using namespace std;
+class Response;
 
 // Code: List of coloured pegs representing a code or a guess
 class Code {
@@ -27,6 +28,9 @@ public:
 
     // Compare
     bool operator==(const Code &other) const;
+    
+    // Get colour distribution
+    vector<size_t> mapColours() const;
 };
 
 #endif

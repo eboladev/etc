@@ -13,7 +13,7 @@ using namespace std;
 int main(int argc, const char * argv[]) {
     srand((unsigned)time(0));
     Code code = Code::random();
-    cout << "\t\t(" << code.repr() << ")" << endl;
+    cout << "Code to break: " << code.repr() << endl;
     
     string line;
     for (int iter = 1;; iter++) {
