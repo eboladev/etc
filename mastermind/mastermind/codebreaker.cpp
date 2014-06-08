@@ -1,13 +1,12 @@
 #include <stdlib.h>
 #include <time.h>
-#include <string>
 #include <iostream>
 #include <list>
 #include <cmath>
 
 #include "config.h"
-#include "response.h"
 #include "code.h"
+#include "response.h"
 
 using namespace std;
 
@@ -66,6 +65,7 @@ Code findBestGuess() {
     }
 }
 
+// Game loop
 int main(int argc, const char * argv[]) {
     srand((unsigned)time(0));
     setupCodes();
