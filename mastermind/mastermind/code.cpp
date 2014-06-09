@@ -1,6 +1,7 @@
 #include <string>
 #include <algorithm>
-#include "stdlib.h"
+#include <stdlib.h>
+#include <time.h>
 
 #include "code.h"
 #include "response.h"
@@ -30,6 +31,11 @@ Code::Code(size_t n) {
 
 // Construct a random code
 Code Code::random() {
+    static bool isSeeded = false;
+    if (!isSeeded) {
+        srand((unsigned)time(0));
+        isSeeded = true;
+    }
     string pegs;
     for (size_t i = 0; i < Config::NumPegs; i++) {
         pegs += '1' + (unsigned)rand() % Config::NumColours;

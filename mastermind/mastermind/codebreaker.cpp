@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include <time.h>
 #include <iostream>
 #include <list>
 #include <cmath>
@@ -21,7 +19,7 @@ void setupGuesses() {
 }
 
 // Remove all guesses that would not give the same response
-void removeNonMatchingCodes(const Code &guess, const Response &response) {
+void removeNonMatchingGuesses(const Code &guess, const Response &response) {
     for (list<Code>::iterator i = guesses.begin(); i != guesses.end();) {
         Response r = guess.respond(*i);
         if (r == response) {
@@ -34,23 +32,20 @@ void removeNonMatchingCodes(const Code &guess, const Response &response) {
 
 // Game loop
 int main(int argc, const char * argv[]) {
-    srand((unsigned)time(0));
     setupGuesses();
-    Code code = Code::random();
-    cout << "Code to break: " << code.repr() << endl;
+    Code secret = Code::random();
+    cout << "Code to break: " << secret.repr() << endl;
     
-    Code guess("1122"); // Initial guess
+    Code guess("1122");
     while (true) {
-        Response response = code.respond(guess);
+        Response response = secret.respond(guess);
         cout << "Guessing " << guess.repr() << ": " << response.repr() << endl;
         if (response.isSolved()) {
             cout << "Solved!" << endl;
             return 0;
         }
-        removeNonMatchingCodes(guess, response);
+        removeNonMatchingGuesses(guess, response);
         guess = guesses.front();
     }
-    
-    return 1;
 }
 

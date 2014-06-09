@@ -109,9 +109,9 @@
 			productReference = 9631663219433DB6001E49C5 /* codemaker */;
 			productType = "com.apple.product-type.tool";
 		};
-		963166421943DA06001E49C5 /* codebraker */ = {
+		963166421943DA06001E49C5 /* codebreaker */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 963166491943DA06001E49C5 /* Build configuration list for PBXNativeTarget "codebraker" */;
+			buildConfigurationList = 963166491943DA06001E49C5 /* Build configuration list for PBXNativeTarget "codebreaker" */;
 			buildPhases = (
 				9631663F1943DA06001E49C5 /* Sources */,
 				963166401943DA06001E49C5 /* Frameworks */,
@@ -121,7 +121,7 @@
 			);
 			dependencies = (
 			);
-			name = codebraker;
+			name = codebreaker;
 			productName = codebraker;
 			productReference = 963166431943DA06001E49C5 /* codebraker */;
 			productType = "com.apple.product-type.tool";
@@ -148,7 +148,7 @@
 			projectRoot = "";
 			targets = (
 				9631663119433DB6001E49C5 /* codemaker */,
-				963166421943DA06001E49C5 /* codebraker */,
+				963166421943DA06001E49C5 /* codebreaker */,
 			);
 		};
 /* End PBXProject section */
@@ -300,7 +300,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		963166491943DA06001E49C5 /* Build configuration list for PBXNativeTarget "codebraker" */ = {
+		963166491943DA06001E49C5 /* Build configuration list for PBXNativeTarget "codebreaker" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9631664A1943DA06001E49C5 /* Debug */,
