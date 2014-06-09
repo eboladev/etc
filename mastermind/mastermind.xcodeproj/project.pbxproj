@@ -70,12 +70,12 @@
 			isa = PBXGroup;
 			children = (
 				96D5963B194460A000FD3B76 /* config.h */,
-				9631665219445DE0001E49C5 /* code.cpp */,
 				9631664E1943DCDF001E49C5 /* code.h */,
+				9631665219445DE0001E49C5 /* code.cpp */,
 				9631664F1943DEE4001E49C5 /* codebreaker.cpp */,
 				9631663519433DB6001E49C5 /* codemaker.cpp */,
-				96D5963819445F2800FD3B76 /* response.cpp */,
 				9631664D1943DC96001E49C5 /* response.h */,
+				96D5963819445F2800FD3B76 /* response.cpp */,
 				9631663319433DB6001E49C5 /* Products */,
 			);
 			sourceTree = "<group>";
